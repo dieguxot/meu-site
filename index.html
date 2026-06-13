@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>dieguinho</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins', sans-serif;
+}
+
+body{
+background:#0f0f0f;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.card{
+width:92%;
+max-width:420px;
+background:#1a1a1a;
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.page{display:none;}
+.active{display:block;}
+
+img,video{
+width:100%;
+border-radius:15px;
+margin-bottom:10px;
+}
+
+.btn{
+background:#fff;
+color:#000;
+border:none;
+padding:12px;
+width:100%;
+margin:8px 0;
+border-radius:20px;
+font-weight:600;
+cursor:pointer;
+}
+
+.cat,.place{
+background:#fff;
+color:#000;
+padding:12px;
+margin:6px 0;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+}
+
+#final{
+color:#fff;
+white-space:pre-line;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- VÍDEO 1 -->
+<div id="p1" class="page active">
+<h2>OI AMOR</h2>
+<video autoplay muted loop>
+<source src="video1.mp4">
+</video>
+<button class="btn" onclick="go(2)">Continuar</button>
+</div>
+
+<!-- VÍDEO 2 -->
+<div id="p2" class="page">
+<h2>Pergunta importante</h2>
+<video autoplay muted loop>
+<source src="video2.mp4">
+</video>
+<button class="btn" onclick="go(3)">Continuar</button>
+</div>
+
+<!-- VÍDEO 3 -->
+<div id="p3" class="page">
+<video autoplay muted loop>
+<source src="video3.mp4">
+</video>
+<button class="btn" onclick="go(4)">Continuar</button>
+</div>
+
+<!-- PERGUNTA -->
+<div id="p4" class="page">
+<h2>Você quer ir a um date comigo?</h2>
+<button class="btn" onclick="go(5)">SIM</button>
+</div>
+
+<!-- DATA + HORA + IMG3 -->
+<div id="p5" class="page">
+
+<img src="img3.jpg">
+
+<h3>Escolha data e hora</h3>
+
+<input type="date" id="date">
+<input type="time" id="time">
+
+<button class="btn" onclick="go(6)">Continuar</button>
+
+</div>
+
+<!-- CATEGORIAS -->
+<div id="p6" class="page">
+<h3>Escolha o tipo de lugar</h3>
+
+<div class="cat" onclick="load('restaurante')">Restaurantes</div>
+<div class="cat" onclick="load('cafe')">Cafeterias</div>
+<div class="cat" onclick="load('parque')">Parques</div>
+<div class="cat" onclick="load('shopping')">Shoppings</div>
+<div class="cat" onclick="load('cinema')">Cinema</div>
+
+</div>
+
+<!-- LUGARES -->
+<div id="p7" class="page">
+<h3>Escolha o lugar</h3>
+<div id="places"></div>
+
+<button class="btn" onclick="skip()">Não sei, você escolhe</button>
+</div>
+
+<!-- FINAL COM IMG4 -->
+<div id="p8" class="page">
+
+<img src="img4.jpg">
+
+<h2>💖 Nosso encontro está marcado 💖</h2>
+
+<p id="final"></p>
+
+<button class="btn" onclick="openMap()">Ver no Maps</button>
+
+</div>
+
+</div>
+
+<script>
+
+let selectedDate=""
+let selectedTime=""
+let selectedPlace=""
+let currentList=[]
+
+function go(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"))
+document.getElementById("p"+p).classList.add("active")
+
+if(p===8){
+selectedDate=document.getElementById("date").value
+selectedTime=document.getElementById("time").value
+
+document.getElementById("final").innerText=
+`📅 Data: ${selectedDate || "Não definido"}
+⏰ Hora: ${selectedTime || "Não definido"}
+📍 Lugar: ${selectedPlace || "A escolher"}`
+}
+}
+
+/* LISTA GRANDE DE LUGARES */
+const data = {
+
+restaurante:[
+"A Casa do Porco","Bar da Dona Onça","Tordesilhas","Skye Bar","Terraço Itália","Paris 6",
+"Outback","Coco Bambu","Madero","Ráscal","Famiglia Mancini","Bráz Pizzaria","Maní",
+"Tan Tan","Evvai","Barbacoa","Rinconcito Peruano","Pirajá","Veloso Bar"
+],
+
+cafe:[
+"Coffee Lab","We Coffee","Starbucks Paulista","Octavio Café","Santo Grão","The Coffee",
+"Café Girondino","Urbe Café","Casa Bauducco","Livraria Cultura Café","Botanikafé","Fillmore Ipiranga"
+],
+
+parque:[
+"Parque Ibirapuera","Parque Villa Lobos","Parque da Independência","Parque do Carmo",
+"Parque Celso Daniel","Parque Chico Mendes","Jardim Botânico de São Paulo"
+],
+
+shopping:[
+"Shopping Morumbi","Shopping ABC","Shopping Metrópole","Shopping Eldorado",
+"Shopping Center Norte","Shopping Ibirapuera","Pátio Paulista"
+],
+
+cinema:[
+"Cinemark","Cinépolis","UCI Morumbi","Kinoplex","Cine Belas Artes","PlayArte"
+]
+
+}
+
+function load(type){
+currentList=data[type]
+document.getElementById("places").innerHTML=""
+
+currentList.forEach(p=>{
+let div=document.createElement("div")
+div.className="place"
+div.innerText=p
+
+div.onclick=()=>{
+selectedPlace=p
+go(8)
+}
+
+document.getElementById("places").appendChild(div)
+})
+
+go(7)
+}
+
+function skip(){
+selectedPlace="A escolher"
+go(8)
+}
+
+/* MAPS CORRIGIDO E FORTE */
+function openMap(){
+
+if(!selectedPlace){
+alert("Sem lugar selecionado")
+return
+}
+
+let query = selectedPlace + " São Paulo Brasil"
+
+let url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(query)
+
+window.open(url,"_blank")
+}
+
+</script>
+
+</body>
+</html>
