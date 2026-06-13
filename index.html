@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>dieguinho</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Poppins', sans-serif;
+}
+
+body{
+background:#0f0f0f;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+}
+
+.card{
+width:92%;
+max-width:420px;
+background:#1a1a1a;
+padding:20px;
+border-radius:20px;
+text-align:center;
+}
+
+.page{display:none;}
+.active{display:block;}
+
+img,video{
+width:100%;
+border-radius:15px;
+margin-bottom:10px;
+}
+
+.btn{
+background:#fff;
+color:#000;
+border:none;
+padding:12px;
+width:100%;
+margin:8px 0;
+border-radius:20px;
+font-weight:600;
+cursor:pointer;
+}
+
+.cat,.place{
+background:#fff;
+color:#000;
+padding:12px;
+margin:6px 0;
+border-radius:12px;
+cursor:pointer;
+font-weight:600;
+}
+
+.iconLine{
+display:flex;
+align-items:center;
+gap:8px;
+margin:4px 0;
+}
+
+#final{
+color:#fff;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<!-- VÍDEO 1 -->
+<div id="p1" class="page active">
+<h2>OI AMOR</h2>
+<video autoplay muted loop>
+<source src="video1.mp4">
+</video>
+<button class="btn" onclick="go(2)">Continuar</button>
+</div>
+
+<!-- VÍDEO 2 -->
+<div id="p2" class="page">
+<h2>Pergunta importante</h2>
+<video autoplay muted loop>
+<source src="video2.mp4">
+</video>
+<button class="btn" onclick="go(3)">Continuar</button>
+</div>
+
+<!-- VÍDEO 3 -->
+<div id="p3" class="page">
+<video autoplay muted loop>
+<source src="video3.mp4">
+</video>
+<button class="btn" onclick="go(4)">Continuar</button>
+</div>
+
+<!-- PERGUNTA -->
+<div id="p4" class="page">
+
+<img src="img1.jpg">
+
+<h2>Você aceita ir a um date comigo?</h2>
+
+<button class="btn" onclick="go(5)">SIM</button>
+<button class="btn" onclick="go(5)">COM CERTEZA</button>
+
+</div>
+
+<!-- DATA + HORA -->
+<div id="p5" class="page">
+
+<img src="img3.jpg">
+
+<h3>Escolha data e hora</h3>
+
+<input type="date" id="date">
+<input type="time" id="time">
+
+<button class="btn" onclick="go(6)">Continuar</button>
+
+</div>
+
+<!-- CATEGORIAS -->
+<div id="p6" class="page">
+
+<h3>Escolha o tipo de lugar</h3>
+
+<div class="cat" onclick="load('restaurante')">Restaurantes</div>
+<div class="cat" onclick="load('cafe')">Cafeterias</div>
+<div class="cat" onclick="load('parque')">Parques</div>
+<div class="cat" onclick="load('shopping')">Shoppings</div>
+<div class="cat" onclick="load('cinema')">Cinema</div>
+
+</div>
+
+<!-- LUGARES -->
+<div id="p7" class="page">
+
+<h3>Escolha o lugar</h3>
+<div id="places"></div>
+
+<button class="btn" onclick="skip()">Não sei, você escolhe</button>
+
+</div>
+
+<!-- FINAL -->
+<div id="p8" class="page">
+
+<img src="img4.jpg">
+
+<h2>Nosso encontro está marcado</h2>
+
+<div id="final"></div>
+
+<button class="btn" onclick="openMap()">Ver no Maps</button>
+
+</div>
+
+</div>
+
+<script>
+
+let selectedDate = "";
+let selectedTime = "";
+let selectedPlace = null;
+
+/* LISTA COMPLETA */
+const data = {
+
+restaurante:[
+{name:"A Casa do Porco",lat:-23.5489,lng:-46.6388},
+{name:"Bar da Dona Onça",lat:-23.5456,lng:-46.6362},
+{name:"Tordesilhas",lat:-23.5689,lng:-46.6688},
+{name:"Skye Bar",lat:-23.5654,lng:-46.6655},
+{name:"Terraço Itália",lat:-23.5461,lng:-46.6369},
+{name:"Paris 6",lat:-23.5612,lng:-46.6561}
+],
+
+cafe:[
+{name:"Coffee Lab",lat:-23.5631,lng:-46.6544},
+{name:"We Coffee",lat:-23.5645,lng:-46.6522},
+{name:"Starbucks",lat:-23.5650,lng:-46.6530},
+{name:"Octavio Café",lat:-23.5609,lng:-46.6520},
+{name:"Santo Grão",lat:-23.5638,lng:-46.6571},
+{name:"The Coffee",lat:-23.5655,lng:-46.6510},
+{name:"Fillmore Ipiranga",lat:-23.5889,lng:-46.6098},
+{name:"Kiki Café",lat:-23.5895,lng:-46.6102}
+],
+
+parque:[
+{name:"Ibirapuera",lat:-23.5874,lng:-46.6576},
+{name:"Villa Lobos",lat:-23.5468,lng:-46.7236},
+{name:"Parque da Independência",lat:-23.5853,lng:-46.6092}
+],
+
+shopping:[
+{name:"Morumbi Shopping",lat:-23.6226,lng:-46.6987},
+{name:"Shopping ABC",lat:-23.6533,lng:-46.5332},
+{name:"Eldorado",lat:-23.5667,lng:-46.7003}
+],
+
+cinema:[
+{name:"Cinemark Paulista",lat:-23.5587,lng:-46.6619},
+{name:"Cinépolis JK",lat:-23.5956,lng:-46.6892},
+{name:"UCI Morumbi",lat:-23.6221,lng:-46.6990}
+]
+
+};
+
+function go(p){
+document.querySelectorAll(".page").forEach(e=>e.classList.remove("active"));
+document.getElementById("p"+p).classList.add("active");
+
+if(p===8){
+selectedDate = document.getElementById("date").value;
+selectedTime = document.getElementById("time").value;
+
+document.getElementById("final").innerHTML =
+"📅 " + (selectedDate || "Não definido") + "<br>" +
+"⏰ " + (selectedTime || "Não definido") + "<br>" +
+"📍 " + (selectedPlace ? selectedPlace.name : "A escolher");
+}
+}
+
+function load(type){
+
+let list = data[type] || [];
+document.getElementById("places").innerHTML = "";
+
+list.forEach(p=>{
+let div = document.createElement("div");
+div.className = "place";
+div.innerText = p.name;
+
+div.onclick = () => {
+selectedPlace = p;
+go(8);
+};
+
+document.getElementById("places").appendChild(div);
+});
+
+go(7);
+}
+
+function skip(){
+selectedPlace = null;
+go(8);
+}
+
+/* MAPS DEFINITIVO */
+function openMap(){
+
+if(!selectedPlace){
+alert("Sem lugar selecionado");
+return;
+}
+
+window.open(
+"https://www.google.com/maps?q=" + selectedPlace.lat + "," + selectedPlace.lng,
+"_blank"
+);
+
+}
+
+</script>
+
+</body>
+</html>
